@@ -1,1 +1,1 @@
-ECAgent
+ECAgent==0.0.2

@@ -29,11 +29,10 @@ class MoneyModel(Model):
     def run(self):
         # Our basic simulation will run for 10 iterations but you can create more complicated stopping conditions if
         # you want to.
-        while self.timestep < 10:
+        while self.systemManager.timestep < 10:
             # Execute systems calls the execute functions of all of the registered systems (when appropriate) and
             # increments the timestep counter by 1
             self.systemManager.executeSystems()
-            self.timestep+=1 #This must be fixed
 
 # This is our custom system class. It inherits from the base System class.
 class MoneySystem(System):
@@ -60,11 +59,12 @@ class MoneySystem(System):
                 pass
             # Give away money to a random agent
             else:
-                rand = randrange(len(self.model.environment.agents))
-                key = list(self.model.environment.agents.keys())[rand]
-                other_agent = self.model.environment.getAgent(key)
-                # This is hack, fix
-                other_agent.components[0].wealth +=1
+                # We can use the environment object get a random agent
+                # Be careful when using this method, if there are agents that have different components
+                # then you must include a component filter like so: getRandomAgent([Component1,Component2,..])
+                other_agent = self.model.environment.getRandomAgent()
+                # Now we grab the MoneyComponent from the agent using the getComponent() method
+                other_agent.getComponent(MoneyComponent).wealth += 1
                 component.wealth -= 1
 
 # This is our custom component class. It inherits from the base Component class.
@@ -101,5 +101,6 @@ if __name__ == '__main__':
     model.run() # This will run our model for 10 iterations
 
     # Now we can print out the wealth distribution of our model here is a simple way to do that using
-    # list comprehension.
-    print ([x.wealth for x in model.systemManager.componentPools["MONEY"]])
+    # list comprehension. We use the SystemManager.getComponents() to get all of the components registered to
+    # a specific system
+    print ([x.wealth for x in model.systemManager.getComponents("MONEY")])

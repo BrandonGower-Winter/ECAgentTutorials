@@ -9,10 +9,12 @@ from ECAgent.Core import *
 class MoneyModel(Model):
 
     def __init__(self, num_agents):
-        # The Model base requires that an environment be supplied to it upon initialization
+        # The Model base class has two optional parameters environment and seed.
         # Because our model does not need a complex environment with positional information, we can just
-        # use the default Environment class instead.
-        super().__init__(Environment())
+        # use the default Environment class instead. We do this by not supplying our own environment obj.
+        # We will, however, be supplying a seed to the random number generator so that we can compare outputs
+        # and the end of the tutorial.
+        super().__init__(seed=44)
 
         # After we've created our System, we now have to register it with SystemManager.
         self.systemManager.addSystem(MoneySystem(self))
@@ -45,12 +47,13 @@ class MoneySystem(System):
         super().__init__("MONEY", model)
 
     # In order for our system to do anything at runtime, we must override the execute function like so.
-    def execute(self, components: [Component]):
+    def execute(self):
         # The execute function is called by the SystemManager whenever our System must process some logic.
         # In the case of our MoneySystem, it will execute once every cycle.
 
-        # As you'll notice, the execute function takes a list of components as input
-        # These components are the components created specifically for the MoneySystem ie: MoneyComponents
+        # Now we must get all of the components that interest us.
+        # In this case, we are interested in MoneyComponents
+        components = self.model.systemManager.getComponents(MoneyComponent)
 
         # Here we iterate over the components
         for component in components:
@@ -72,10 +75,10 @@ class MoneySystem(System):
 # are affected by a specific system.
 class MoneyComponent(Component):
 
-    def __init__(self, agentID: str, model: Model):
+    def __init__(self, agent, model):
         # Here we call the base class constructor and supply it with the agent's, that this component is attached to, ID
         # the system ID which for our custom system is 'MONEY' and a reference to the model
-        super().__init__(agentID,"MONEY",model)
+        super().__init__(agent, model)
 
         # Components of intended to be POD (Plain old data) so they will have little functionality.
         # Here we create and store the only property that this component will hold
@@ -85,14 +88,14 @@ class MoneyComponent(Component):
 # This is our custom agent class. It inherits from the base Agent class.
 class MoneyAgent(Agent):
 
-    def __init__(self, id: str, model: Model):
+    def __init__(self, id: str, model):
         # Here we call the base class constructor. The agent class requires that the agent be given a unqiue ID
         super().__init__(id, model)
 
         # This is where the beauty of ECS comes into play.
         # Now we add a money component to agent and the agent will automatically be registered with the appropriate
         # system and will be affected by said system whenever it executes.
-        self.addComponent(MoneyComponent(self.id,self.model))
+        self.addComponent(MoneyComponent(self,self.model))
 
 
 if __name__ == '__main__':
@@ -103,4 +106,4 @@ if __name__ == '__main__':
     # Now we can print out the wealth distribution of our model here is a simple way to do that using
     # list comprehension. We use the SystemManager.getComponents() to get all of the components registered to
     # a specific system
-    print ([x.wealth for x in model.systemManager.getComponents("MONEY")])
+    print ([x.wealth for x in model.systemManager.getComponents(MoneyComponent)])

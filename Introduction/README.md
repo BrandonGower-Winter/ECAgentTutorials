@@ -7,22 +7,22 @@ with ECS, see the [Wikipedia](https://en.wikipedia.org/wiki/Entity_component_sys
 
 ## Getting Started:
 
-To start of with, you should clone this repo and using your favourite 
-Python editor, open  to the ECAgentTutorials/Introduction/Tutorial directory.
+To start of with, you should clone this repo and, using your favourite 
+Python editor, open the ECAgentTutorials/Introduction/Tutorial directory.
 
 Now that you're all sorted, we can talk about setting up our python virtual 
 environment. If you are familiar with python and virtual environments,
  you can set this up yourself and just use:
 
-```
+```bash
 $ pip install ECAgent 
 ```
 
-If you are unfamiliar with virtual environments, don't worry. We have prepared
+to install ECAgent. If you are unfamiliar with virtual environments, don't worry. We have prepared
 a makefile that will setup the virtual environment with ECAgent already included.
-Simply open your terminal, navigate to the Tutorial directory and type the command:
+Simply open a command line terminal, navigate to the Tutorial directory and type the command:
 
-```
+```bash
 $ make
 ```
 
@@ -32,14 +32,14 @@ more about virtual environments, click the link [here](https://docs.python.org/3
 
 To activate the virtual environment, type the following command in your terminal:
 
-```
+```bash
 $ source ./venv/bin/activate
 ```
 
-You should now see '(venv)' appear as a prefix in your terminal. If you everwant to
+You should now see '(venv)' appear as a prefix in your terminal. If you ever want to
  deactivate the virtual environment, just type the following command:
 
-```
+```bash
 $ deactivate
 ```
  
@@ -62,8 +62,7 @@ population.
 
 Let's get started!
 
-The first thing we want to do is open up, in our favourite Python editor,
-the Tutorial.py file, located in the /src/ directory. You should see a completely
+The first thing we want to do is open up the Tutorial.py file, located in the /src/ directory. You should see a completely
 blank file.
 
 Lets kick things off by first importing our package like so:
@@ -86,13 +85,13 @@ of ECAgent. They are:
 
 You will need to understand how all of these clases work in order to create ABMs
 in ECAgent. If you are familiar with ECS, you should recognize the System and Component classes
-and, if you are familiar with ABMs you are most likely familiar with the Model, Environment and Agent
+and, if you are familiar with ABMs, you are most likely familiar with the Model, Environment and Agent
 classes.
 
-Let's start with the simplest class, the Component class. In ECAgent and ECS 
+Let's start with the simplest class, the Component class. In ECAgent, and ECS 
 in general, Components are plain-old-data (POD) types. This means that they only store information, 
 in variables, and have little-to-no functionality. In our Model we would create
-a wealth component like so:
+a money component like so:
 
 ```python
 class MoneyComponent(Component):
@@ -102,15 +101,15 @@ class MoneyComponent(Component):
         self.wealth = 1
 ```  
 
-As you can see, we inherit from the Component base class and definte a constructor.
+As you can see, we inherit from the Component base class and define a constructor.
 The Component class takes two arguments: The agent that the compoenent belongs too
 and the simulation model. We simply add those parameters to our MoneyComponent constrcutor
-so that we pass along that information when we initialize our MoneyComponents.
+so that we can pass along that information when we initialize our MoneyComponents.
 We also add a wealth parameter and set it to 1. This follows our first rule in that all
 agents will start with 1 coin.
 
 You'll notice that the MoneyComponent class is incredibly simple. This is intentional.
-In ECS components should rarely be complex. It is ok to add some functionality to calculate
+In ECS, components should rarely be complex. It is ok to add some functionality to calculate
 composite or auxillary properties but, as a general rule, you should keep your components
 as simple as possible.
 
@@ -138,15 +137,15 @@ the agent in our model. If you do not supply each agent with a unique id, the fi
 will throw an Exception.
 
 Now that we have the Agent(Entity) and Component classes out of the way, lets create 
-our system class. In ECS, Systems are responsible for modifying the values of components.
+our System class. In ECS, Systems are responsible for modifying the values of components.
 They can also trigger events that trigger other systems and so on and so forth. ECAgent
-does not have an event system by default. ECAgent exectures System procedures by way of a
+does not have an event system by default. ECAgent executes System procedures through a
 SystemManager. The SystemManager is responsible for scheduling when events
 run and when they do not. It is possible to write your own SystemManager but
-that is beyond the scope of this tutorial. We will just the default one.
+that is beyond the scope of this tutorial. We will just use the default one.
 
 As you'll remember from our brief model description, at every iteration of
-our model an agent, if possible, must give away 1 coin to another random agent.
+our model, an agent, if possible, must give away 1 coin to another random agent.
 Knowing this, we can create our MoneySystem like so:
 
 ```python
@@ -168,11 +167,12 @@ class MoneySystem(System):
 ```  
 
 This will be the most complicated part of our model. As is the norm, our System base class
-requires a that we supply it with model it belongs too. Like before, we will just
+requires a that we supply it with the model it belongs too. Like before, we will just
 pass this in when we create the system. You will also see one other value being pass in, "MONEY".
 This is the system's id. Just like the Agents, systems also require unique identifiers. 
 The id is used by the SystemManager and some of the other Systems in ECAgent.
-If you look at the docs, you'll notice that the System base clas initiailization method has a
+
+If you look at the docs, you'll notice that the System base class initiailization method has a
 number of optional parameters. These parameters control how frequently and in what order your
 systems should run. It is out of scope for this tutorial but just know that our MoneySystem
 will run once at every iteration of our model.
@@ -189,11 +189,11 @@ agent. We can use the Environment.getRandomAgent() method to get a random agent 
 Agent.getComponent() method to get that agent's MoneyComponent.
 
 For our simple model, using getRandomAgent() and getComponent() is fine because
-we will only have one type of agent in our model and we each agent will have a 
+we will only ever have one type of agent in our model and we know for certain that each agent will have a 
 MoneyComponent. If you are working with multiple types of Agents with varying
 components, you should first make sure the agent has the component you are looking
 for. This can be done using the Agent.hasComponent() function which returns True
-if the agent has the desired component.
+if the agent has the desired component(s). You can also supply the Environment.getRandomAgent() function with a filter that will automatically exclude any agents that don't contain all of the components specified by the filter. For more information on this, check out the docs.
 
 ## Putting it all together:
 
@@ -209,7 +209,7 @@ environment that contains some kind of reference to all of the agents. By defaul
 and if no Environment is supplied to the Model upon initialization, the model
 will create a empty Environment() object. This environment simply  holds
 a list of the agents currently occupying it and is actually the base class for
-the complex environments.
+the complex environments that we will introuce in further tutorials.
 
 As a result of this functionality, you will not see an Environment() object being
 instantiated explicitly, just be aware of the fact that it is.
@@ -247,15 +247,15 @@ the system manager. Next we add the agents. You'll notice that our MoneyModel ca
 have a variable number of agents (num_agents). We simply create that many agents
 and store them in the environment using environment.addAgent(). You'll also notice
 that we are ensuring that each agent has a unique iq by using the value of i. This is
-a really simply yet effective method to ensure each agent is uniquely identified.
+a really simple yet effective method to ensure each agent is uniquely identifiable.
 
-We then define a run method than we can call from outside the model class. This
+We then define a run() method that we can call from outside the model class. This
 method runs the model for 10 iterations. To do this we use the timestep property found
 in the systemManager object.
 
-lastly, we call the systemManager.executeSystems() method. This method is responsible
+Lastly, we call the systemManager.executeSystems() method. This method is responsible
 for calling the execute() method we defined for our MoneySystem class. At the
-end of the executeSystems() method the systemManager will increase the timestep counter by 1.
+end of the executeSystems() method, the systemManager will increase the timestep counter by 1.
 
 That's it!!! Our model is finally complete. All we now have to do is run it.
 
@@ -279,7 +279,7 @@ a bit of list comprehension.
 If you run this code in an IDE or in the terminal like so (make sure your virtual 
 environment is active!!):
 
-```
+```bash
 $ python ./src/Tutorial.py
 ```
 
@@ -299,7 +299,7 @@ for this entire tutorial.
 ## Conclusion:
 
 You have successfully created your first ABM using ECAgent. As you can hopefully tell,
-ECAgent is incredibly flexible and be extended greatly. If you are still interested in learning
+ECAgent is incredibly flexible and can be extended greatly. If you are still interested in learning
 more about ECAgent, take a look at some of the other, more complicated, tutorials and,
 if you have any questions, please feel free to email or message one of the devs and they will
 be more than happy to assist you.

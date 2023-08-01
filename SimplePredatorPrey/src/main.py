@@ -1,21 +1,46 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import argparse
 
 from PredatorPrey import PredatorPreyModel
 
-# TODO Add Argparse support
 def main():
-    model = PredatorPreyModel(50, 100, 50, 30, 4, 25, 0.04, 0.06)
 
-    iterations = 5000
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-s', '--size', help='Size of the environment.', default=50, type=int)
+    parser.add_argument('--sheep', help='Number of initial Sheep.', default=100, type=int)
+    parser.add_argument('--wolf', help='Number of initial Wolves.', default=50, type=int)
+    parser.add_argument('--grow', help='Regrow Rate of Grass Entities.', default=30, type=int)
+    parser.add_argument('--sgain', help='Sheep Gain.', default=4, type=int)
+    parser.add_argument('--wgain', help='Wolf Gain.', default=25, type=int)
+    parser.add_argument('--srepro', help='Reproduction Rate of Sheep.', default=0.04, type=float)
+    parser.add_argument('--wrepro', help='Reproduction Rate of Wolves.', default=0.06, type=float)
+    parser.add_argument('--iterations', help='Length of Simulation.', default=1000, type=int)
+    parser.add_argument('--seed', help='Seed of random number generator.', default=345968, type=int)
+    parser.add_argument('--images', help='Write environment to images?', action='store_true')
 
+    parser = parser.parse_args()
+
+    model = PredatorPreyModel(
+        parser.size,
+        parser.sheep,
+        parser.wolf,
+        parser.grow,
+        parser.sgain,
+        parser.wgain,
+        parser.srepro,
+        parser.wrepro,
+        parser.seed,
+        parser.images)
+
+    iterations = parser.iterations
+    records = model.systemManager.systems['collector'].records
     for i in range(iterations):
         model.systemManager.executeSystems()
-
-    records = model.systemManager.systems['collector'].records
+        print('Iteration: {}: Sheep: {} Wolves:{}'.format(i, records['sheep'][-1], records['wolves'][-1]))
 
     fig, ax = plt.subplots()
-    ax.set_title('Population Dynamics of Simple\n Predator Prey Model')
+    ax.set_title('Sheep and Wolf Populations in \nSimple Predator Prey Model')
     ax.set_xlabel('Iterations')
     ax.set_ylabel('Population')
 

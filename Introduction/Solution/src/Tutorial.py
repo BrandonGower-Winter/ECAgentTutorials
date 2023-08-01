@@ -22,10 +22,10 @@ class MoneyModel(Model):
 
         # Now we can add our agents
         # It is important to remember to add your Systems first and then your agents.
-        for i in range(0,num_agents):
+        for i in range(0, num_agents):
             # We are just giving the agents the id 'a' + the i value in the loop
             # This ensure that each agent will have a unique ID
-            self.environment.addAgent(MoneyAgent('a' + str(i), self))
+            self.environment.add_agent(MoneyAgent('a' + str(i), self))
 
     # This method will be used by our main method to run the simulation.
     def run(self):
